@@ -1,0 +1,5 @@
+[local]
+localhost
+
+[testing]
+testing.vauxoo.com ansible_ssh_user="root" 
