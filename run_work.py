@@ -79,10 +79,6 @@ def main(args):
     )
     parser.add_option('--vault-password', dest="vault_password",
        help="password for vault encrypted files")
-    parser.add_option('-t', '--tags', dest='tags', default='all',
-        help="only run plays and tasks tagged with these values")
-    parser.add_option('--skip-tags', dest='skip_tags',
-        help="only run plays and tasks whose tags do not match these values")
     parser.add_option('--syntax-check', dest='syntax', action='store_true',
         help="perform a syntax check on the playbook, but do not execute it")
     parser.add_option('--list-tasks', dest='listtasks', action='store_true',
@@ -141,11 +137,10 @@ def main(args):
     #extra_vars = utils.parse_extra_vars(options.extra_vars, vault_pass)
     extra_vars = {'host': 'testing', 'vars_file': 'the_vars.yml'}
     print extra_vars
-    only_tags = options.tags.split(",")
-    print "Tags %s " % str(only_tags)
-    skip_tags = options.skip_tags
-    if options.skip_tags is not None:
-        skip_tags = options.skip_tags.split(",")
+    ## truiz: meanwhile we do not need tags
+    only_tags = ['all']
+    skip_tags = None
+    print "ST %s" %str(skip_tags)
 
     ## truiz: this is just a list of playbooks
     playbooks = ['ansible/the_work.yml']
