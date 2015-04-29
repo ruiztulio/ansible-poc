@@ -85,8 +85,6 @@ def main(args):
         help="list all tasks that would be executed")
     parser.add_option('--list-tags', dest='listtags', action='store_true',
         help="list all available tags")
-    parser.add_option('--step', dest='step', action='store_true',
-        help="one-step-at-a-time: confirm each task before running")
     parser.add_option('--start-at-task', dest='start_at',
         help="start the playbook at the task matching this name")
     parser.add_option('--force-handlers', dest='force_handlers',
@@ -163,7 +161,8 @@ def main(args):
         # Empty inventory
         utils.warning("provided hosts list is empty, only localhost is available")
         no_hosts = True
-    inventory.subset(options.subset)
+    #print options.subset
+    #inventory.subset(options.subset)
     if len(inventory.list_hosts()) == 0 and no_hosts is False:
         # Invalid limit
         raise errors.AnsibleError("Specified --limit does not match any hosts")
@@ -172,8 +171,7 @@ def main(args):
 
         stats = callbacks.AggregateStats()
         playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
-        if options.step:
-            playbook_cb.step = options.step
+
         if options.start_at:
             playbook_cb.start_at = options.start_at
         runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
