@@ -33,9 +33,6 @@ import sys
 import os
 import stat
 
-# Augment PYTHONPATH to find Python modules relative to this file path
-# This is so that we can find the modules when running from a local checkout
-# installed as editable with `pip install -e ...` or `python setup.py develop`
 
 import ansible.playbook
 import ansible.constants as C
@@ -111,21 +108,21 @@ def main(args):
 
     options.ask_vault_pass = options.ask_vault_pass or C.DEFAULT_ASK_VAULT_PASS
 
-    if options.listhosts or options.syntax or options.listtasks or options.listtags:
-        (_, _, vault_pass) = utils.ask_passwords(ask_vault_pass=options.ask_vault_pass)
-    else:
-        options.ask_pass = options.ask_pass or C.DEFAULT_ASK_PASS
-        # Never ask for an SSH password when we run with local connection
-        if options.connection == "local":
-            options.ask_pass = False
+    # if options.listhosts or options.syntax or options.listtasks or options.listtags:
+    #     (_, _, vault_pass) = utils.ask_passwords(ask_vault_pass=options.ask_vault_pass)
+    # else:
+    #     options.ask_pass = options.ask_pass or C.DEFAULT_ASK_PASS
+    #     # Never ask for an SSH password when we run with local connection
+    #     if options.connection == "local":
+    #         options.ask_pass = False
 
-        # set pe options
-        utils.normalize_become_options(options)
-        prompt_method = utils.choose_pass_prompt(options)
-        (sshpass, becomepass, vault_pass) = utils.ask_passwords(ask_pass=options.ask_pass,
-                                                    become_ask_pass=options.become_ask_pass,
-                                                    ask_vault_pass=options.ask_vault_pass,
-                                                    become_method=prompt_method)
+    #     # set pe options
+    #     utils.normalize_become_options(options)
+    #     prompt_method = utils.choose_pass_prompt(options)
+    #     (sshpass, becomepass, vault_pass) = utils.ask_passwords(ask_pass=options.ask_pass,
+    #                                                 become_ask_pass=options.become_ask_pass,
+    #                                                 ask_vault_pass=options.ask_vault_pass,
+    #                                                 become_method=prompt_method)
 
     # read vault_pass from a file
     if not options.ask_vault_pass and options.vault_password_file:
@@ -166,6 +163,12 @@ def main(args):
     if len(inventory.list_hosts()) == 0 and no_hosts is False:
         # Invalid limit
         raise errors.AnsibleError("Specified --limit does not match any hosts")
+    print options.become
+    print options.become_method
+    print options.become_user
+    print options.remote_user
+    print options.timeout
+    print becomepass
 
     for playbook in playbooks:
 
@@ -175,14 +178,15 @@ def main(args):
         if options.start_at:
             playbook_cb.start_at = options.start_at
         runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
+        print runner_cb
 
         pb = ansible.playbook.PlayBook(
             playbook=playbook,
             # module_path=options.module_path,
             inventory=inventory,
             # forks=options.forks,
-            remote_user=options.remote_user,
-            remote_pass=sshpass,
+            # remote_user=options.remote_user,
+            # remote_pass=sshpass,
             callbacks=playbook_cb,
             runner_callbacks=runner_cb,
             stats=stats,
@@ -191,9 +195,9 @@ def main(args):
             become=options.become,
             become_method=options.become_method,
             become_user=options.become_user,
-            become_pass=becomepass,
+            # become_pass=becomepass,
             extra_vars=extra_vars,
-            # private_key_file=options.private_key_file,
+            private_key_file=options.private_key_file,
             # only_tags=only_tags,
             # skip_tags=skip_tags,
             check=options.check,
@@ -252,9 +256,11 @@ def main(args):
         unreachable_hosts = []
 
         try:
-
-            pb.run()
-
+            print "Before run"
+            res = pb.run()
+            print "After run"
+            ## truiz: returns a resume of all work done
+            print res
             hosts = sorted(pb.stats.processed.keys())
             display(callbacks.banner("PLAY RECAP"))
             playbook_cb.on_stats(pb.stats)
