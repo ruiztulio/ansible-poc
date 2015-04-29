@@ -137,10 +137,6 @@ def main(args):
     #extra_vars = utils.parse_extra_vars(options.extra_vars, vault_pass)
     extra_vars = {'host': 'testing', 'vars_file': 'the_vars.yml'}
     print extra_vars
-    ## truiz: meanwhile we do not need tags
-    only_tags = ['all']
-    skip_tags = None
-    print "ST %s" %str(skip_tags)
 
     ## truiz: this is just a list of playbooks
     playbooks = ['ansible/the_work.yml']
