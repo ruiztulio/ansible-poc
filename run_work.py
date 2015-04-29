@@ -137,22 +137,29 @@ def main(args):
     if not options.ask_vault_pass and options.vault_password_file:
         vault_pass = utils.read_vault_file(options.vault_password_file)
 
-    extra_vars = utils.parse_extra_vars(options.extra_vars, vault_pass)
+    ## truiz: extra vars is dict with the vars and values
+    #extra_vars = utils.parse_extra_vars(options.extra_vars, vault_pass)
+    extra_vars = {'host': 'testing', 'vars_file': 'the_vars.yml'}
     print extra_vars
     only_tags = options.tags.split(",")
+    print "Tags %s " % str(only_tags)
     skip_tags = options.skip_tags
     if options.skip_tags is not None:
         skip_tags = options.skip_tags.split(",")
 
-    for playbook in args:
+    ## truiz: this is just a list of playbooks
+    playbooks = ['ansible/the_work.yml']
+    for playbook in playbooks:
         print playbook
         if not os.path.exists(playbook):
             raise errors.AnsibleError("the playbook: %s could not be found" % playbook)
         if not (os.path.isfile(playbook) or stat.S_ISFIFO(os.stat(playbook).st_mode)):
             raise errors.AnsibleError("the playbook: %s does not appear to be a file" % playbook)
 
+    ## truiz: is better to pass the inventory file
     inventory = ansible.inventory.Inventory(options.inventory, vault_password=vault_pass)
-
+    print options.inventory
+    print inventory
     # Note: slightly wrong, this is written so that implicit localhost
     # (which is not returned in list_hosts()) is taken into account for
     # warning if inventory is empty.  But it can't be taken into account for
@@ -170,8 +177,7 @@ def main(args):
         # Invalid limit
         raise errors.AnsibleError("Specified --limit does not match any hosts")
 
-    # run all playbooks specified on the command line
-    for playbook in args:
+    for playbook in playbooks:
 
         stats = callbacks.AggregateStats()
         playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
