@@ -173,7 +173,6 @@ def main(args):
         # Invalid limit
         raise errors.AnsibleError("Specified --limit does not match any hosts")
     print options.become
-    print options.become_method
     print options.become_user
     print options.remote_user
     print options.timeout
@@ -198,8 +197,8 @@ def main(args):
             stats=stats,
             timeout=timeout,
             # transport=options.connection,
-            become=options.become,
-            become_method=options.become_method,
+            #become=options.become,
+            become_method='sudo',
             become_user=options.become_user,
             # become_pass=becomepass,
             extra_vars=extra_vars,
@@ -212,51 +211,51 @@ def main(args):
             force_handlers=options.force_handlers,
         )
 
-        if options.flush_cache:
-            display(callbacks.banner("FLUSHING FACT CACHE"))
-            pb.SETUP_CACHE.flush()
+        # if options.flush_cache:
+        #     display(callbacks.banner("FLUSHING FACT CACHE"))
+        #     pb.SETUP_CACHE.flush()
 
-        if options.listhosts or options.listtasks or options.syntax or options.listtags:
-            print ''
-            print 'playbook: %s' % playbook
-            print ''
-            playnum = 0
-            for (play_ds, play_basedir) in zip(pb.playbook, pb.play_basedirs):
-                playnum += 1
-                play = ansible.playbook.Play(pb, play_ds, play_basedir,
-                                              vault_password=pb.vault_password)
-                label = play.name
-                hosts = pb.inventory.list_hosts(play.hosts)
+        # if options.listhosts or options.listtasks or options.syntax or options.listtags:
+        #     print ''
+        #     print 'playbook: %s' % playbook
+        #     print ''
+        #     playnum = 0
+        #     for (play_ds, play_basedir) in zip(pb.playbook, pb.play_basedirs):
+        #         playnum += 1
+        #         play = ansible.playbook.Play(pb, play_ds, play_basedir,
+        #                                       vault_password=pb.vault_password)
+        #         label = play.name
+        #         hosts = pb.inventory.list_hosts(play.hosts)
 
-                if options.listhosts:
-                    print '  play #%d (%s): host count=%d' % (playnum, label, len(hosts))
-                    for host in hosts:
-                        print '    %s' % host
+        #         if options.listhosts:
+        #             print '  play #%d (%s): host count=%d' % (playnum, label, len(hosts))
+        #             for host in hosts:
+        #                 print '    %s' % host
 
-                if options.listtags or options.listtasks:
-                    print '  play #%d (%s):\tTAGS: [%s]' % (playnum, label,','.join(sorted(set(play.tags))))
+        #         if options.listtags or options.listtasks:
+        #             print '  play #%d (%s):\tTAGS: [%s]' % (playnum, label,','.join(sorted(set(play.tags))))
 
-                    if options.listtags:
-                        tags = []
-                        for task in pb.tasks_to_run_in_play(play):
-                            tags.extend(task.tags)
-                        print '    TASK TAGS: [%s]' % (', '.join(sorted(set(tags).difference(['untagged']))))
+        #             if options.listtags:
+        #                 tags = []
+        #                 for task in pb.tasks_to_run_in_play(play):
+        #                     tags.extend(task.tags)
+        #                 print '    TASK TAGS: [%s]' % (', '.join(sorted(set(tags).difference(['untagged']))))
 
-                    if options.listtasks:
+        #             if options.listtasks:
 
-                        for task in pb.tasks_to_run_in_play(play):
-                            if getattr(task, 'name', None) is not None:
-                                # meta tasks have no names
-                                print '    %s\tTAGS: [%s]' % (task.name, ', '.join(sorted(set(task.tags).difference(['untagged']))))
+        #                 for task in pb.tasks_to_run_in_play(play):
+        #                     if getattr(task, 'name', None) is not None:
+        #                         # meta tasks have no names
+        #                         print '    %s\tTAGS: [%s]' % (task.name, ', '.join(sorted(set(task.tags).difference(['untagged']))))
 
-                if options.listhosts or options.listtasks or options.listtags:
-                    print ''
-            continue
+        #         if options.listhosts or options.listtasks or options.listtags:
+        #             print ''
+        #     continue
 
-        if options.syntax:
-            # if we've not exited by now then we are fine.
-            print 'Playbook Syntax is fine'
-            return 0
+        # if options.syntax:
+        #     # if we've not exited by now then we are fine.
+        #     print 'Playbook Syntax is fine'
+        #     return 0
 
         failed_hosts = []
         unreachable_hosts = []
