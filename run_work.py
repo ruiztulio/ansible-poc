@@ -174,7 +174,7 @@ def main(args):
 
         stats = callbacks.AggregateStats()
         playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
-
+        print "start at %s " % str(options.start_at)
         if options.start_at:
             playbook_cb.start_at = options.start_at
         runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
