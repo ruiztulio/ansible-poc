@@ -64,6 +64,21 @@ def hostcolor(host, stats, color=True):
 def main(args):
     ''' run ansible-playbook operations '''
 
+    ## truiz: here I add options that will become parameters in the function
+
+    ## truiz: extra vars is dict with the vars and values
+    extra_vars = {'host': 'testing', 'vars_file': 'the_vars.yml'}
+    print extra_vars
+
+    ## truiz: this is just a list of playbooks
+    playbooks = ['ansible/the_work.yml']
+
+    ## truiz: The file with hosts and their vars
+    inventory_file = 'ansible/inventory'
+
+    ## truiz: this could be an usefull parameter
+    timeout = 10
+
     # create parser for CLI options
     parser = utils.base_parser(
         constants=C,
@@ -128,13 +143,7 @@ def main(args):
     # if not options.ask_vault_pass and options.vault_password_file:
         # vault_pass = utils.read_vault_file(options.vault_password_file)
 
-    ## truiz: extra vars is dict with the vars and values
-    #extra_vars = utils.parse_extra_vars(options.extra_vars, vault_pass)
-    extra_vars = {'host': 'testing', 'vars_file': 'the_vars.yml'}
-    print extra_vars
 
-    ## truiz: this is just a list of playbooks
-    playbooks = ['ansible/the_work.yml']
     for playbook in playbooks:
         print playbook
         if not os.path.exists(playbook):
@@ -143,7 +152,7 @@ def main(args):
             raise errors.AnsibleError("the playbook: %s does not appear to be a file" % playbook)
 
     ## truiz: is better to pass the inventory file
-    inventory = ansible.inventory.Inventory('ansible/inventory', vault_password=vault_pass)
+    inventory = ansible.inventory.Inventory(inventory_file, vault_password=vault_pass)
     print options.inventory
     print inventory
     # Note: slightly wrong, this is written so that implicit localhost
@@ -174,9 +183,6 @@ def main(args):
 
         stats = callbacks.AggregateStats()
         playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
-        print "start at %s " % str(options.start_at)
-        if options.start_at:
-            playbook_cb.start_at = options.start_at
         runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
         print runner_cb
 
@@ -190,7 +196,7 @@ def main(args):
             callbacks=playbook_cb,
             runner_callbacks=runner_cb,
             stats=stats,
-            timeout=options.timeout,
+            timeout=timeout,
             # transport=options.connection,
             become=options.become,
             become_method=options.become_method,
