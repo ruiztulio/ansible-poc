@@ -97,16 +97,16 @@ def main(args):
         return 1
 
     # privlege escalation command line arguments need to be mutually exclusive
-    utils.check_mutually_exclusive_privilege(options, parser)
+    # utils.check_mutually_exclusive_privilege(options, parser)
 
-    if (options.ask_vault_pass and options.vault_password_file):
-            parser.error("--ask-vault-pass and --vault-password-file are mutually exclusive")
+    # if (options.ask_vault_pass and options.vault_password_file):
+            # parser.error("--ask-vault-pass and --vault-password-file are mutually exclusive")
 
     sshpass = None
     becomepass = None
     vault_pass = None
 
-    options.ask_vault_pass = options.ask_vault_pass or C.DEFAULT_ASK_VAULT_PASS
+    # options.ask_vault_pass = options.ask_vault_pass or C.DEFAULT_ASK_VAULT_PASS
 
     # if options.listhosts or options.syntax or options.listtasks or options.listtags:
     #     (_, _, vault_pass) = utils.ask_passwords(ask_vault_pass=options.ask_vault_pass)
@@ -125,8 +125,8 @@ def main(args):
     #                                                 become_method=prompt_method)
 
     # read vault_pass from a file
-    if not options.ask_vault_pass and options.vault_password_file:
-        vault_pass = utils.read_vault_file(options.vault_password_file)
+    # if not options.ask_vault_pass and options.vault_password_file:
+        # vault_pass = utils.read_vault_file(options.vault_password_file)
 
     ## truiz: extra vars is dict with the vars and values
     #extra_vars = utils.parse_extra_vars(options.extra_vars, vault_pass)
@@ -143,7 +143,7 @@ def main(args):
             raise errors.AnsibleError("the playbook: %s does not appear to be a file" % playbook)
 
     ## truiz: is better to pass the inventory file
-    inventory = ansible.inventory.Inventory(options.inventory, vault_password=vault_pass)
+    inventory = ansible.inventory.Inventory('ansible/inventory', vault_password=vault_pass)
     print options.inventory
     print inventory
     # Note: slightly wrong, this is written so that implicit localhost
